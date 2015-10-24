@@ -8,6 +8,7 @@
 #include "apr_strings.h"
 
 #include <string>
+#include <vector>
 
 extern "C" module AP_MODULE_DECLARE_DATA imagereceiver_module;
 
@@ -33,7 +34,7 @@ static int imagereceiver_handler(request_rec *r)
     apr_bucket *e;
     apreq_brigade_copy(bb, param->upload);
     apr_size_t len = 0;
-    std::string str = "";
+    std::vector<char> vec;
     for (e = APR_BRIGADE_FIRST(bb); e != APR_BRIGADE_SENTINEL(bb); e = APR_BUCKET_NEXT(e)) {
         char *data;
         apr_size_t dlen;
@@ -44,7 +45,7 @@ static int imagereceiver_handler(request_rec *r)
         }
         else {
             const char *data_copied = apr_pstrmemdup(r->pool, data, dlen);
-            str = str + std::string(data_copied);
+            vec.insert(vec.end(), data_copied, data_copied + dlen);
             len += dlen;
             apr_bucket *bucket_copied = apr_bucket_transient_create(data_copied, dlen, r->connection->bucket_alloc);
             apr_bucket_delete(e);
@@ -52,8 +53,9 @@ static int imagereceiver_handler(request_rec *r)
         }
     }
 
-    std::vector<char> vec(str.begin(), str.end());
+    vec.push_back('\0');
     cv::Mat mat = cv::imdecode(cv::Mat(vec), CV_LOAD_IMAGE_COLOR);
+    cv::imwrite("/tmp/a.jpg", mat);
 
     ap_set_content_type(r, "image/jpg");
     ap_set_content_length(r, len);
