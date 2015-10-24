@@ -22,8 +22,7 @@ static int imagereceiver_handler(request_rec *r)
     if (param == NULL) {
         ap_rprintf(r, "NULL\n");
         return OK;
-    }
-    else if (param->upload == NULL) {
+    } else if (param->upload == NULL) {
         ap_rprintf(r, "not upload\n");
         return OK;
     }
