@@ -37,8 +37,8 @@ static int imagereceiver_handler(request_rec *r)
         char *data;
         apr_size_t dlen;
         if (apr_bucket_read(e, (const char **)&data, &dlen, APR_BLOCK_READ) != APR_SUCCESS) {
-            ap_rprintf(r, "bad bucket read\n");
-            break;
+            ap_log_rerror(APLOG_MARK, APLOG_ERR, APLOG_MODULE_INDEX, r, "failed to read bucket");
+            return HTTP_INTERNAL_SERVER_ERROR;
         }
 
         const char *data_copied = apr_pstrmemdup(r->pool, data, dlen);
