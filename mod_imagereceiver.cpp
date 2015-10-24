@@ -35,14 +35,14 @@ static int imagereceiver_handler(request_rec *r)
     std::vector<char> vec;
     for (apr_bucket *e = APR_BRIGADE_FIRST(bb); e != APR_BRIGADE_SENTINEL(bb); e = APR_BUCKET_NEXT(e)) {
         const char *data;
-        apr_size_t dlen;
-        if (apr_bucket_read(e, &data, &dlen, APR_BLOCK_READ) != APR_SUCCESS) {
+        apr_size_t len;
+        if (apr_bucket_read(e, &data, &len, APR_BLOCK_READ) != APR_SUCCESS) {
             ap_log_rerror(APLOG_MARK, APLOG_ERR, APLOG_MODULE_INDEX, r, "failed to read bucket");
             return HTTP_INTERNAL_SERVER_ERROR;
         }
 
-        const char *data_copied = apr_pstrmemdup(r->pool, data, dlen);
-        vec.insert(vec.end(), data_copied, data_copied + dlen);
+        const char *data_copied = apr_pstrmemdup(r->pool, data, len);
+        vec.insert(vec.end(), data_copied, data_copied + len);
         apr_bucket_delete(e);
     }
 
