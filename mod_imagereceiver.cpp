@@ -1,9 +1,13 @@
+#include <opencv2/opencv.hpp>
+
 #include "httpd.h"
 #include "http_config.h"
 #include "http_protocol.h"
 #include "apreq2/apreq_module_apache2.h"
 #include "apreq2/apreq_util.h"
 #include "apr_strings.h"
+
+#include <string>
 
 extern "C" module AP_MODULE_DECLARE_DATA imagereceiver_module;
 
@@ -29,6 +33,7 @@ static int imagereceiver_handler(request_rec *r)
     apr_bucket *e;
     apreq_brigade_copy(bb, param->upload);
     apr_size_t len = 0;
+    std::string str = "";
     for (e = APR_BRIGADE_FIRST(bb); e != APR_BRIGADE_SENTINEL(bb); e = APR_BUCKET_NEXT(e)) {
         char *data;
         apr_size_t dlen;
@@ -39,12 +44,16 @@ static int imagereceiver_handler(request_rec *r)
         }
         else {
             const char *data_copied = apr_pstrmemdup(r->pool, data, dlen);
+            str = str + std::string(data_copied);
             len += dlen;
             apr_bucket *bucket_copied = apr_bucket_transient_create(data_copied, dlen, r->connection->bucket_alloc);
             apr_bucket_delete(e);
             APR_BRIGADE_INSERT_TAIL(ret, bucket_copied);
         }
     }
+
+    std::vector<char> vec(str.begin(), str.end());
+    cv::Mat mat = cv::imdecode(cv::Mat(vec), CV_LOAD_IMAGE_COLOR);
 
     ap_set_content_type(r, "image/jpg");
     ap_set_content_length(r, len);
