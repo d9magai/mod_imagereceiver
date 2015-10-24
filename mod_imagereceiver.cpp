@@ -3,6 +3,7 @@
 #include "httpd.h"
 #include "http_config.h"
 #include "http_protocol.h"
+#include <http_log.h>
 #include "apreq2/apreq_module_apache2.h"
 #include "apreq2/apreq_util.h"
 #include "apr_strings.h"
@@ -12,6 +13,8 @@
 
 extern "C" module AP_MODULE_DECLARE_DATA imagereceiver_module;
 
+APLOG_USE_MODULE(imagereceiver);
+
 static int imagereceiver_handler(request_rec *r)
 {
     if (strcmp(r->handler, "imagereceiver")) {
@@ -20,11 +23,11 @@ static int imagereceiver_handler(request_rec *r)
 
     apreq_param_t *param = apreq_body_get(apreq_handle_apache2(r), "upfile");
     if (param == NULL) {
-        ap_rprintf(r, "NULL\n");
-        return OK;
+        ap_log_rerror(APLOG_MARK, APLOG_ERR, APLOG_MODULE_INDEX, r, "bad request");
+        return HTTP_BAD_REQUEST;
     } else if (param->upload == NULL) {
-        ap_rprintf(r, "not upload\n");
-        return OK;
+        ap_log_rerror(APLOG_MARK, APLOG_ERR, APLOG_MODULE_INDEX, r, "not uploaded");
+        return HTTP_BAD_REQUEST;
     }
 
     apr_bucket_brigade *bb = apr_brigade_create(r->pool, r->connection->bucket_alloc);
