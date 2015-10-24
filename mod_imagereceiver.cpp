@@ -18,8 +18,7 @@ static int imagereceiver_handler(request_rec *r)
         return DECLINED;
     }
 
-    apreq_handle_t *req = apreq_handle_apache2(r);    
-    apreq_param_t *param = apreq_body_get(req, "upfile");
+    apreq_param_t *param = apreq_body_get(apreq_handle_apache2(r), "upfile");
     if (param == NULL) {
         ap_rprintf(r, "NULL\n");
         return OK;
@@ -30,36 +29,25 @@ static int imagereceiver_handler(request_rec *r)
     }
 
     apr_bucket_brigade *bb = apr_brigade_create(r->pool, r->connection->bucket_alloc);
-    apr_bucket_brigade *ret = apr_brigade_create(r->pool, r->connection->bucket_alloc);
-    apr_bucket *e;
     apreq_brigade_copy(bb, param->upload);
-    apr_size_t len = 0;
     std::vector<char> vec;
-    for (e = APR_BRIGADE_FIRST(bb); e != APR_BRIGADE_SENTINEL(bb); e = APR_BUCKET_NEXT(e)) {
+    for (apr_bucket *e = APR_BRIGADE_FIRST(bb); e != APR_BRIGADE_SENTINEL(bb); e = APR_BUCKET_NEXT(e)) {
         char *data;
         apr_size_t dlen;
-
         if (apr_bucket_read(e, (const char **)&data, &dlen, APR_BLOCK_READ) != APR_SUCCESS) {
             ap_rprintf(r, "bad bucket read\n");
             break;
         }
-        else {
-            const char *data_copied = apr_pstrmemdup(r->pool, data, dlen);
-            vec.insert(vec.end(), data_copied, data_copied + dlen);
-            len += dlen;
-            apr_bucket *bucket_copied = apr_bucket_transient_create(data_copied, dlen, r->connection->bucket_alloc);
-            apr_bucket_delete(e);
-            APR_BRIGADE_INSERT_TAIL(ret, bucket_copied);
-        }
+
+        const char *data_copied = apr_pstrmemdup(r->pool, data, dlen);
+        vec.insert(vec.end(), data_copied, data_copied + dlen);
+        apr_bucket_delete(e);
     }
 
     vec.push_back('\0');
     cv::Mat mat = cv::imdecode(cv::Mat(vec), CV_LOAD_IMAGE_COLOR);
     cv::imwrite("/tmp/a.jpg", mat);
 
-    ap_set_content_type(r, "image/jpg");
-    ap_set_content_length(r, len);
-    ap_pass_brigade(r->output_filters, ret);
     return OK;
 }
 
