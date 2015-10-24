@@ -31,11 +31,11 @@ all: mod_imagereceiver.so
 
 # compile
 mod_imagereceiver.o: mod_imagereceiver.cpp
-	g++ -c -fPIC -I$(APXS_INCLUDEDIR) -I/usr/include/apr-1/ -I/usr/include/apreq2/ $(APXS_CFLAGS) $(APXS_CFLAGS_SHLIB) -Wall -o $@ $< 
+	g++ -c -fPIC -I$(APXS_INCLUDEDIR) -I/usr/include/apr-1/ -I/usr/include/apreq2/ -I/opt/opencv/include/ $(APXS_CFLAGS) $(APXS_CFLAGS_SHLIB) -Wall -o $@ $< 
 
 # link
 mod_imagereceiver.so: mod_imagereceiver.o 
-	g++ -fPIC -shared -o $@ $< $(APXS_LIBS_SHLIB) -lapreq2
+	g++ -fPIC -shared -o $@ $< $(APXS_LIBS_SHLIB) -lapreq2 -L/opt/opencv/lib/ -lopencv_core
 
 # install the shared object file into Apache 
 install: all
