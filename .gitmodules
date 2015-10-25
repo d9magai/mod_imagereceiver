@@ -1,0 +1,3 @@
+[submodule "imagematcher"]
+	path = imagematcher
+	url = git@github.com:d9magai/imagematcher.git
