@@ -31,7 +31,7 @@ all: mod_imagereceiver.so
 
 # compile
 mod_imagereceiver.o: mod_imagereceiver.cpp
-	g++ -c -fPIC -I$(APXS_INCLUDEDIR) -I/usr/include/apr-1/ -I/usr/include/apreq2/ -I/opt/opencv/include/ $(APXS_CFLAGS) $(APXS_CFLAGS_SHLIB) -Wall -o $@ $< 
+	g++ -c -fPIC -std=c++11 -I$(APXS_INCLUDEDIR) -I/usr/include/apr-1/ -I/usr/include/apreq2/ -I/opt/opencv/include/ $(APXS_CFLAGS) $(APXS_CFLAGS_SHLIB) -Wall -o $@ $< 
 
 # link
 mod_imagereceiver.so: mod_imagereceiver.o 
