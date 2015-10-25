@@ -13,10 +13,9 @@
 
 extern "C" module AP_MODULE_DECLARE_DATA imagereceiver_module;
 
-APLOG_USE_MODULE(imagereceiver);
+APLOG_USE_MODULE (imagereceiver);
 
-static int imagereceiver_handler(request_rec *r)
-{
+static int imagereceiver_handler(request_rec *r) {
     if (strcmp(r->handler, "imagereceiver")) {
         return DECLINED;
     }
@@ -53,18 +52,15 @@ static int imagereceiver_handler(request_rec *r)
     return OK;
 }
 
-static void imagereceiver_register_hooks(apr_pool_t *p)
-{
+static void imagereceiver_register_hooks(apr_pool_t *p) {
     ap_hook_handler(imagereceiver_handler, NULL, NULL, APR_HOOK_MIDDLE);
 }
 
-module AP_MODULE_DECLARE_DATA imagereceiver_module = {
-    STANDARD20_MODULE_STUFF, 
-    NULL,                  /* create per-dir    config structures */
-    NULL,                  /* merge  per-dir    config structures */
-    NULL,                  /* create per-server config structures */
-    NULL,                  /* merge  per-server config structures */
-    NULL,                  /* table of config file commands       */
-    imagereceiver_register_hooks  /* register hooks                      */
+module AP_MODULE_DECLARE_DATA imagereceiver_module = { STANDARD20_MODULE_STUFF, NULL, /* create per-dir    config structures */
+NULL, /* merge  per-dir    config structures */
+NULL, /* create per-server config structures */
+NULL, /* merge  per-server config structures */
+NULL, /* table of config file commands       */
+imagereceiver_register_hooks /* register hooks                      */
 };
 
