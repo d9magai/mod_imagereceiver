@@ -16,6 +16,26 @@ extern "C" module AP_MODULE_DECLARE_DATA imagereceiver_module;
 
 APLOG_USE_MODULE (imagereceiver);
 
+cv::Mat convert_to_Mat(request_rec *r, apreq_param_t *param) {
+
+    apr_bucket_brigade *bb = apr_brigade_create(r->pool, r->connection->bucket_alloc);
+    apreq_brigade_copy(bb, param->upload);
+    std::vector<char> vec;
+    for (apr_bucket *e = APR_BRIGADE_FIRST(bb); e != APR_BRIGADE_SENTINEL(bb); e = APR_BUCKET_NEXT(e)) {
+        const char *data;
+        apr_size_t len;
+        if (apr_bucket_read(e, &data, &len, APR_BLOCK_READ) != APR_SUCCESS) {
+            throw "failed to read bucket";
+        }
+
+        const char *dup_data = apr_pstrmemdup(r->pool, data, len);
+        vec.insert(vec.end(), dup_data, dup_data + len);
+        apr_bucket_delete(e);
+    }
+    vec.push_back('\0');
+    return cv::imdecode(cv::Mat(vec), CV_LOAD_IMAGE_COLOR);
+}
+
 static int imagereceiver_handler(request_rec *r) {
     if (strcmp(r->handler, "imagereceiver")) {
         return DECLINED;
