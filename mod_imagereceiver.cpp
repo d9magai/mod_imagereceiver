@@ -50,25 +50,13 @@ static int imagereceiver_handler(request_rec *r) {
         return HTTP_BAD_REQUEST;
     }
 
-    apr_bucket_brigade *bb = apr_brigade_create(r->pool, r->connection->bucket_alloc);
-    apreq_brigade_copy(bb, param->upload);
-    std::vector<char> vec;
-    for (apr_bucket *e = APR_BRIGADE_FIRST(bb); e != APR_BRIGADE_SENTINEL(bb); e = APR_BUCKET_NEXT(e)) {
-        const char *data;
-        apr_size_t len;
-        if (apr_bucket_read(e, &data, &len, APR_BLOCK_READ) != APR_SUCCESS) {
-            ap_log_rerror(APLOG_MARK, APLOG_ERR, APLOG_MODULE_INDEX, r, "failed to read bucket");
-            return HTTP_INTERNAL_SERVER_ERROR;
-        }
-
-        const char *data_copied = apr_pstrmemdup(r->pool, data, len);
-        vec.insert(vec.end(), data_copied, data_copied + len);
-        apr_bucket_delete(e);
+    cv::Mat mat;
+    try {
+        mat = convert_to_Mat(r, param);
+    } catch (char const *message) {
+        ap_log_rerror(APLOG_MARK, APLOG_ERR, APLOG_MODULE_INDEX, r, message);
+        return HTTP_INTERNAL_SERVER_ERROR;
     }
-
-    vec.push_back('\0');
-    cv::Mat mat = cv::imdecode(cv::Mat(vec), CV_LOAD_IMAGE_COLOR);
-
     json_object *jobj = json_object_new_object();
     json_object_object_add(jobj, "rows", json_object_new_string(std::to_string(mat.rows).c_str()));
     json_object_object_add(jobj, "cols", json_object_new_string(std::to_string(mat.cols).c_str()));
