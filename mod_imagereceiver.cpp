@@ -48,7 +48,12 @@ static int imagereceiver_handler(request_rec *r) {
 
     vec.push_back('\0');
     cv::Mat mat = cv::imdecode(cv::Mat(vec), CV_LOAD_IMAGE_COLOR);
-    cv::imwrite("/tmp/a.jpg", mat);
+
+    json_object *jobj = json_object_new_object();
+    json_object_object_add(jobj, "rows", json_object_new_string(std::to_string(mat.rows).c_str()));
+    json_object_object_add(jobj, "cols", json_object_new_string(std::to_string(mat.cols).c_str()));
+    ap_set_content_type(r, "application/json");
+    ap_rprintf(r, json_object_to_json_string(jobj));
 
     return OK;
 }
