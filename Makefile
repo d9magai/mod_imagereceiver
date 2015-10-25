@@ -29,8 +29,6 @@ all: mod_imagereceiver.so
 # INCLUDES=-I/usr/include/apreq2/
 # LIBS=-lapreq2
 
-export LD_LIBRARY_PATH=/usr/local/lib64/:$LD_LIBRARY_PATH
-
 # compile
 mod_imagereceiver.o: mod_imagereceiver.cpp
 	g++ -c -fPIC -I$(APXS_INCLUDEDIR) -I/usr/include/apr-1/ -I/usr/include/apreq2/ -I/opt/opencv/include/ $(APXS_CFLAGS) $(APXS_CFLAGS_SHLIB) -Wall -o $@ $< 
