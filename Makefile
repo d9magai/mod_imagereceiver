@@ -35,7 +35,7 @@ mod_imagereceiver.o: mod_imagereceiver.cpp
 
 # link
 mod_imagereceiver.so: mod_imagereceiver.o 
-	g++ -fPIC -shared -o $@ $< $(APXS_LIBS_SHLIB) -lapreq2 -L/usr/lib64/ -L/opt/opencv/lib -lopencv_shape -lopencv_stitching -lopencv_objdetect -lopencv_superres -lopencv_videostab -lopencv_calib3d -lopencv_features2d -lopencv_highgui -lopencv_videoio -lopencv_imgcodecs -lopencv_video -lopencv_photo -lopencv_ml -lopencv_imgproc -lopencv_flann -lopencv_core -lopencv_hal
+	g++ -fPIC -shared -o $@ $< $(APXS_LIBS_SHLIB) -lapreq2 -ljson -L/usr/lib64/ -L/opt/opencv/lib -lopencv_shape -lopencv_stitching -lopencv_objdetect -lopencv_superres -lopencv_videostab -lopencv_calib3d -lopencv_features2d -lopencv_highgui -lopencv_videoio -lopencv_imgcodecs -lopencv_video -lopencv_photo -lopencv_ml -lopencv_imgproc -lopencv_flann -lopencv_core -lopencv_hal
 
 # install the shared object file into Apache 
 install: all
