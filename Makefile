@@ -26,9 +26,6 @@ all: mod_imagereceiver.so
 # compile the shared object file. use g++ instead of letting apxs call
 # ld so we end up with the right c++ stuff. We do this in two steps,
 # compile and link.
-# INCLUDES=-I/usr/include/apreq2/
-# LIBS=-lapreq2
-#
 
 # get OpenCV's cflags, libs
 export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:/opt/opencv/lib/pkgconfig
