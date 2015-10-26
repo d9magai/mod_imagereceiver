@@ -43,10 +43,10 @@ static int imagereceiver_handler(request_rec *r) {
 
     apreq_param_t *param = apreq_body_get(apreq_handle_apache2(r), "upfile");
     if (param == NULL) {
-        ap_log_rerror(APLOG_MARK, APLOG_ERR, APLOG_MODULE_INDEX, r, "bad request");
+        ap_log_rerror(APLOG_MARK, APLOG_ERR, APLOG_MODULE_INDEX, r, "no such param");
         return HTTP_BAD_REQUEST;
     } else if (param->upload == NULL) {
-        ap_log_rerror(APLOG_MARK, APLOG_ERR, APLOG_MODULE_INDEX, r, "not uploaded");
+        ap_log_rerror(APLOG_MARK, APLOG_ERR, APLOG_MODULE_INDEX, r, "not upload");
         return HTTP_BAD_REQUEST;
     }
 
